@@ -1,6 +1,0 @@
-Pillow
-gym
-numba
-numpy
-pyyaml
-scipy
