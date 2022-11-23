@@ -1,10 +1,14 @@
 import numpy as np
 
-class DisparityExtender:
+class Kevin:
+    def __init__(self):
+        self.cdistance = 0.0
+        self.fdistance = 0.0
+
     CAR_WIDTH = 0.31
     # the min difference between adjacent LiDAR points for us to call them disparate
     DIFFERENCE_THRESHOLD = 2.
-    SPEED = 5.
+    # SPEED = 5.
     # the extra safety room we plan for along walls (as a percentage of car_width/2)
     SAFETY_PERCENTAGE = 300.
 
@@ -95,6 +99,8 @@ class DisparityExtender:
             close_idx = first_idx + np.argmin(points)
             far_idx = first_idx + np.argmax(points)
             close_dist = ranges[close_idx]
+            self.cdistance = close_dist
+            self.fdistance = ranges[far_idx]
             num_points_to_cover = self.get_num_points_to_cover(close_dist,
                                                                width_to_cover)
             cover_right = close_idx < far_idx
@@ -109,7 +115,17 @@ class DisparityExtender:
         """
         lidar_angle = (range_index - (range_len / 2)) * self.radians_per_point
         steering_angle = np.clip(lidar_angle, np.radians(-90), np.radians(90))
-        return steering_angle
+        if 1.3 >= abs(steering_angle) >= 0.1:
+            return steering_angle
+        else:
+            return 0
+
+    def go_fast(self, angle): # tmp name
+        if abs(angle) >= 0.1 or self.cdistance <= 1:
+            speed = self.cdistance * abs(angle) * 4
+        else:
+            speed = self.fdistance * 0.7
+        return speed
 
     def process_lidar(self, ranges):
         """ Run the disparity extender algorithm!
@@ -124,5 +140,5 @@ class DisparityExtender:
                                               self.CAR_WIDTH, self.SAFETY_PERCENTAGE) # Comment in here
         steering_angle = self.get_steering_angle(proc_ranges.argmax(),
                                                  len(proc_ranges)) # Find Steering Angle
-        speed = self.SPEED # Make a speed function 
+        speed = self.go_fast(steering_angle) # Make a speed function
         return speed, steering_angle
