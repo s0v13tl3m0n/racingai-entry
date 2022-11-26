@@ -121,10 +121,12 @@ class Kevin:
             return 0
 
     def go_fast(self, angle): # tmp name
-        if abs(angle) >= 0.1 or self.cdistance <= 1:
-            speed = self.cdistance * abs(angle) * 4
+        if abs(angle) >= 0.5 or self.cdistance <= 0.7:
+            speed = self.cdistance * abs(angle) * 6.5
+        elif abs(angle) >= 0.1:
+            speed = self.cdistance * abs(angle) * 8
         else:
-            speed = self.fdistance * 0.7
+            speed = self.fdistance * 0.5
         return speed
 
     def process_lidar(self, ranges):
