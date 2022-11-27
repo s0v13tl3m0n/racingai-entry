@@ -10,7 +10,7 @@ class Kevin:
     DIFFERENCE_THRESHOLD = 2.
     # SPEED = 5.
     # the extra safety room we plan for along walls (as a percentage of car_width/2)
-    SAFETY_PERCENTAGE = 300.
+    SAFETY_PERCENTAGE = 325.
 
     def preprocess_lidar(self, ranges):
         """ Any preprocessing of the LiDAR data can be done in this function.
@@ -125,9 +125,18 @@ class Kevin:
             speed = self.cdistance * abs(angle) * 6.5
         elif abs(angle) >= 0.1:
             speed = self.cdistance * abs(angle) * 8
+        elif self.cdistance <= 0.3:
+            speed = 1
         else:
             speed = self.fdistance * 0.5
-        return speed
+
+        if speed > 13:
+            return 13
+        elif speed < 1:
+            return 1
+        else:
+            return speed
+
 
     def process_lidar(self, ranges):
         """ Run the disparity extender algorithm!
@@ -139,8 +148,13 @@ class Kevin:
         differences = self.get_differences(proc_ranges) # find the gradients between each point
         disparities = self.get_disparities(differences, self.DIFFERENCE_THRESHOLD) # find "disparities"
         proc_ranges = self.extend_disparities(disparities, proc_ranges,
-                                              self.CAR_WIDTH, self.SAFETY_PERCENTAGE) # Comment in here
+                                              self.CAR_WIDTH, self.SAFETY_PERCENTAGE)
         steering_angle = self.get_steering_angle(proc_ranges.argmax(),
                                                  len(proc_ranges)) # Find Steering Angle
         speed = self.go_fast(steering_angle) # Make a speed function
+
+        # print(self.fdistance)
+        if self.fdistance > 30: # idk how or why but this somehow fixed fishtailing so it stays in
+            speed = 1
+
         return speed, steering_angle
