@@ -1,6 +1,7 @@
 import numpy as np
 
-class Kevin:
+class Driver:
+    # formally known as Kevin
     def __init__(self):
         self.cdistance = 0.0
         self.fdistance = 0.0
@@ -120,6 +121,7 @@ class Kevin:
         else:
             return 0
 
+    # if i had shame it would be for the following code
     def go_fast(self, angle): # tmp name
         if abs(angle) >= 0.5 or self.cdistance <= 0.7:
             speed = self.cdistance * abs(angle) * 6.5
